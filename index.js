@@ -11,11 +11,20 @@ function parseGET(url) {
     }, {url: null, selector: null});
 }
 
+function returnError(response) {
+    response.statusCode = 500;
+    response.close();
+};
+
 var service = server.listen(system.env.PORT || 8088, function (request, response) {
     var params = parseGET(request),
         url = params.url,
         selector = params.selector,
         page = require('webpage').create();
+
+    if (!url) {
+        return error(response);
+    }
 
     page.viewportSize = { width: 1024, height: 600 };
 
