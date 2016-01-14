@@ -12,12 +12,13 @@ function parseGET(url) {
 }
 
 function returnError(response) {
+    console.log('Error');
     response.statusCode = 500;
     response.close();
 };
 
 var service = server.listen(system.env.PORT || 8088, function (request, response) {
-    var params = parseGET(request),
+    var params = parseGET(request.url),
         url = params.url,
         selector = params.selector,
         page = require('webpage').create();
@@ -28,7 +29,7 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
 
     page.viewportSize = { width: 1024, height: 600 };
 
-    page.open(url, function (status) {
+    page.open('http://' + url, function (status) {
         if (status !== 'success') {
             console.log('Unable to load the URL', url);
         } else {
@@ -36,7 +37,8 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                 var clipRect = page.evaluate(function (s) {
                     var cr = document.querySelector(s).getBoundingClientRect();
                     return cr;
-                }, selector);
+                }, selector),
+                    renderedData;
 
                 page.clipRect = {
                     top: clipRect.top,
@@ -45,13 +47,19 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                     height: clipRect.height
                 };
 
-                response.statusCode = 200;
-                response.headers = {
+                renderedData = page.renderBase64('png');
+
+                console.log('Rendering');
+
+                response.writeHead(200, {
                     'Content-Type': 'image/png',
                     'Cache': 'no-cache'
-                };
-                response.write(page.renderBase64('png'));
+                });
+                response.setEncoding('binary');
+                response.write(atob(renderedData));
                 response.close();
+
+                page.close();
             }, 400);
         }
     });
