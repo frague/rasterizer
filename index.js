@@ -12,9 +12,12 @@ function parseGET(url) {
     }, {url: null, selector: null});
 }
 
-function respond(response, code, headers, message) {
+function respond(response, code, headers, message, isBinary) {
+    if (isBinary) {
+        response.setEncoding('binary');
+    }
     response.writeHead(code, headers);
-    response.write(message)
+    response.write(message);
     response.close();
 };
 
@@ -63,18 +66,19 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                     height: clipRect.height
                 };
 
-                renderedPage = page.renderBase64('png');
+                renderedPage = atob(page.renderBase64('png'));
                 page.close();
 
-                response.setEncoding('binary');
                 return respond(
                     response,
                     200,
                     {
-                        'Content-Type': 'image/png; charset=utf-8',
+                        'Content-Type': 'image/png',
+                        'Content-Length': renderedPage.length.toString(),
                         'Cache': 'no-cache'
                     },
-                    atob(renderedPage)
+                    renderedPage,
+                    true
                 );
             }, 400);
         }
