@@ -71,7 +71,7 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                     response,
                     200,
                     {
-                        'Content-Type': 'image/png',
+                        'Content-Type': 'image/png; charset=utf-8',
                         'Cache': 'no-cache'
                     },
                     atob(renderedPage)
