@@ -24,7 +24,7 @@ function formResponse(response) {
 };
 
 function errorResponse(response, code, error) {
-    respond(response, 504, {'Content-Type': 'text/html'}, error);
+    respond(response, code, {'Content-Type': 'text/html'}, error);
 };
 
 var service = server.listen(system.env.PORT || 8088, function (request, response) {
@@ -52,6 +52,7 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                     renderedPage;
 
                 if (!clipRect) {
+                    page.close();
                     return errorResponse(response, 400, 'Selector not found');
                 }
 
