@@ -67,7 +67,7 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                 page.close();
 
                 response.setEncoding('binary');
-                respond(
+                return respond(
                     response,
                     200,
                     {
