@@ -48,7 +48,8 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                 var clipRect = page.evaluate(function (s) {
                     var cr = document.querySelector(s).getBoundingClientRect();
                     return cr;
-                }, selector);
+                }, selector),
+                    renderedPage;
 
                 if (!clipRect) {
                     return errorResponse(response, 400, 'Selector not found');
@@ -61,6 +62,9 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                     height: clipRect.height
                 };
 
+                renderedPage = page.renderBase64('png');
+                page.close();
+
                 response.setEncoding('binary');
                 respond(
                     response,
@@ -69,10 +73,8 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                         'Content-Type': 'image/png',
                         'Cache': 'no-cache'
                     },
-                    atob(page.renderBase64('png'))
+                    atob(renderedPage)
                 );
-
-                page.close();
             }, 400);
         }
     });
