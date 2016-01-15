@@ -20,7 +20,7 @@ function respond(response, code, headers, message) {
 
 function formResponse(response) {
     var fs = require('fs');
-    respond(response, 400, {'Content-Type': 'text/html'}, fs.read('form.html'));
+    respond(response, 200, {'Content-Type': 'text/html'}, fs.read('form.html'));
 };
 
 function errorResponse(response, code, error) {
