@@ -1,6 +1,7 @@
 var webserver = require('webserver'),
     server = webserver.create(),
-    system = require('system');
+    system = require('system'),
+    fs = require('fs');
 
 function parseGET(url) {
     var query = url.substr(url.indexOf('?') + 1);
@@ -11,34 +12,47 @@ function parseGET(url) {
     }, {url: null, selector: null});
 }
 
-function returnError(response) {
-    console.log('Error');
-    response.statusCode = 500;
+function respond(response, code, headers, message) {
+    response.writeHead(code, headers);
+    response.write(message)
     response.close();
+};
+
+function formResponse(response) {
+    var fs = require('fs');
+    respond(response, 400, {'Content-Type': 'text/html'}, fs.read('form.html'));
+};
+
+function errorResponse(response, code, error) {
+    respond(response, 504, {'Content-Type': 'text/html'}, error);
 };
 
 var service = server.listen(system.env.PORT || 8088, function (request, response) {
     var params = parseGET(request.url),
         url = params.url,
-        selector = params.selector,
+        selector = params.selector || 'body',
         page = require('webpage').create();
 
     if (!url) {
-        return error(response);
+        return formResponse(response);
     }
 
     page.viewportSize = { width: 1024, height: 600 };
 
-    page.open('http://' + url, function (status) {
+    page.open(url, function (status) {
         if (status !== 'success') {
-            console.log('Unable to load the URL', url);
+            page.close();
+            return errorResponse(response, 500, 'Internal server error')
         } else {
             window.setTimeout(function () {
                 var clipRect = page.evaluate(function (s) {
                     var cr = document.querySelector(s).getBoundingClientRect();
                     return cr;
-                }, selector),
-                    renderedData;
+                }, selector);
+
+                if (!clipRect) {
+                    return errorResponse(response, 400, 'Selector not found');
+                }
 
                 page.clipRect = {
                     top: clipRect.top,
@@ -47,17 +61,16 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
                     height: clipRect.height
                 };
 
-                renderedData = page.renderBase64('png');
-
-                console.log('Rendering');
-
-                response.writeHead(200, {
-                    'Content-Type': 'image/png',
-                    'Cache': 'no-cache'
-                });
                 response.setEncoding('binary');
-                response.write(atob(renderedData));
-                response.close();
+                respond(
+                    response,
+                    200,
+                    {
+                        'Content-Type': 'image/png',
+                        'Cache': 'no-cache'
+                    },
+                    atob(page.renderBase64('png'))
+                );
 
                 page.close();
             }, 400);
