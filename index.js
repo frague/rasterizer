@@ -101,7 +101,7 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
             window.setTimeout(function () {
                 var clipRect = page.evaluate(function (s) {
                     var style = document.createElement('style'),
-                    text = document.createTextNode('body {-webkit-filter: grayscale(100%);filter: grayscale(100%);}');
+                    text = document.createTextNode('body {filter: brightness(1) grayscale(1) contrast(1) invert(1);}');
                     style.setAttribute('type', 'text/css');
                     style.appendChild(text);
                     document.head.insertBefore(style, document.head.firstChild);
