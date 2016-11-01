@@ -42,6 +42,8 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
 
     page.viewportSize = { width: 1024, height: 600 };
 
+    console.log('Requested URL:', decodeURIComponent(url), ' with selector:', selector);
+
     page.open(url, function (status) {
         if (status !== 'success') {
             page.close();
@@ -49,6 +51,7 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
         } else {
             window.setTimeout(function () {
                 var clipRect = page.evaluate(function (s) {
+                    document.body.style.WebkitFilter='grayscale(100%)';
                     var cr = document.querySelector(s).getBoundingClientRect();
                     return cr;
                 }, selector),
