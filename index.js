@@ -40,6 +40,10 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
         return formResponse(response);
     }
 
+    page.onConsoleMessage = function(msg) {
+        console.log('CONSOLE: ' + msg);
+    };
+
     page.viewportSize = { width: 1024, height: 600 };
 
     console.log('Requested URL:', decodeURIComponent(url), ' with selector:', selector);
@@ -51,7 +55,12 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
         } else {
             window.setTimeout(function () {
                 var clipRect = page.evaluate(function (s) {
-                    document.body.style.WebkitFilter='grayscale(100%)';
+                    var style = document.createElement('style'),
+                    text = document.createTextNode('body {-webkit-filter: grayscale(100%);filter: grayscale(100%);}');
+                    style.setAttribute('type', 'text/css');
+                    style.appendChild(text);
+                    document.head.insertBefore(style, document.head.firstChild);
+
                     var cr = document.querySelector(s).getBoundingClientRect();
                     return cr;
                 }, selector),
