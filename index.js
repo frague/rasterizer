@@ -42,21 +42,19 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
   var params = parseGET(request.url),
     url = decodeURIComponent(params.url),
     selector = params.selector || 'body',
-    css = params.css,
+    css = decodeURIComponent(params.css),
     page = require('webpage').create();
 
   if (!url) {
     return formResponse(response);
   }
-
-  var css = 'body {-webkit-filter: ' + 
-    ['brightness', 'contrast', 'grayscale', 'invert'].map(
-      function (adjustment) {
-        var value = decodeURIComponent(params[adjustment]);
-        return value && value !== 'undefined' ? adjustment + '(' + value + ')' : '';
-      }
-    ).join(' ') 
-  + ';}' + css;
+  var filters = ['brightness', 'contrast', 'grayscale', 'invert'].reduce(
+    function (result, adjustment) {
+      var value = decodeURIComponent(params[adjustment]);
+      return result + (value && value !== 'undefined' ? adjustment + '(' + value + ')' : '');
+    }, ''
+  );
+  var css = (filters ? 'body {-webkit-filter: ' + filters + ';}\n' : '') + css.replace(/\+/g, ' ');
 
   page.viewportSize = { width: 1024, height: 600 };
 
@@ -124,7 +122,7 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
             text = document.createTextNode(css);
             style.setAttribute('type', 'text/css');
             style.appendChild(text);
-            document.head.insertBefore(style, document.head.firstChild);
+            document.body.appendChild(style);
           }
 
           var cr = document.querySelector(s).getBoundingClientRect();

@@ -5,27 +5,72 @@
   </head>
   <body>
     <style>
-
-      form {width: 100%; height: 50%; position: absolute; top: 50%; left: 0; text-align: center}
-      form > * {font: 10pt arial}
-      label {white-space: nowrap}
-      input {margin-right: 10px}
-      #url {width: 300px}
-      #selector {width: 100px}
-      .numeric {width: 30px}
+      body {
+        text-align: center;
+      }
+      form {
+        min-width: 600px; 
+        display: inline-block;
+        text-align: left;
+      }
+      form * {
+        font: 13px Arial
+      }
+      label {
+        white-space: nowrap; 
+        margin: 5px 0;
+      }
+      #url {
+        width: 400px
+      }
+      #selector {
+        width: 100px
+      }
+      .numeric {
+        width: 30px
+      }
+      textarea {
+        width: 100%;
+      }
+      input, textarea, button {
+        border: solid 1px #888;
+        padding: 5px;
+        border-radius: 4px;
+        margin: 5px 0;
+      }
+      .left {
+        position: absolute;
+        width: 150px;
+        text-align: right;
+        padding-top: 20px;
+      }
+      .left label {
+        display: block;
+      }
+      .right {
+        padding: 10px 10px 0 170px;
+      }
+      button {
+        float: right;
+      }
     </style>
     <form>
       <div>
-        <label>URL <input type="text" id="url" name="url" required /></label>
+        <label>URL <input type="text" id="url" name="url" required placeholder="http://" /></label>
         <label>CSS Selector <input type="text" id="selector" name="selector" /></label>
       </div>
-      <div>
-        <label>Brightness <input type="text" name="brightness" class="numeric"></label>
-        <label>Contrast <input type="text" name="contrast" class="numeric"></label>
-        <label>Grayscale <input type="text" name="grayscale" class="numeric"></label>
-        <label>Invert <input type="text" name="invert" class="numeric"></label>
+      <div class="left">
+        <label>Brightness <input type="text" name="brightness" class="numeric" placeholder="%"></label>
+        <label>Contrast <input type="text" name="contrast" class="numeric" placeholder="%"></label>
+        <label>Grayscale <input type="text" name="grayscale" class="numeric" placeholder="%"></label>
+        <label>Invert <input type="text" name="invert" class="numeric" placeholder="%"></label>
       </div>
-      <button type="submit">Submit</button>
+      <div class="right">
+        <label>CSS<br>
+          <textarea rows="10" name="css" placeholder="* {...}"></textarea>
+        </label>
+      </div>
+      <button type="submit">Rasterize</button>
     </form>
   </body>
 </html>
