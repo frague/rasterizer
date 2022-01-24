@@ -57,6 +57,7 @@ var service = server.listen(system.env.PORT || 8088, function (request, response
   var css = (filters ? 'body {-webkit-filter: ' + filters + ';}\n' : '') + css.replace(/\+/g, ' ');
 
   page.viewportSize = { width: 1024, height: 600 };
+  page.settings.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36';
 
   // page.onResourceRequested = function (request) {
   //     system.stderr.writeLine('= onResourceRequested()');
